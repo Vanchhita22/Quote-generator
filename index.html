@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML & Tailwind CSS Starter Pack</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="./main.css">
+    <script src="app.js" defer></script> <!-- Updated: Moved defer to ensure the DOM loads first -->
+</head>
+
+<body>
+    <div class="header">
+        <p class="bg-[#776D8A] text-lg p-3 text-center text-white">Random Quote Generator</p>
+    </div>
+    <div class="main flex items-center justify-center h-screen bg-[#F3E6E3] ">
+        <div class="rounded-lg p-5 bg-white max-w-screen-sm flex flex-col gap-6">
+            <div class="flex justify-between">
+                <div class="">
+                    <i class="fa-solid fa-quote-left text-slate-400 text-5xl"></i>
+                </div>
+                <div class="flex items-center gap-5">
+                    <button id="copy" class=""><i class="fa-solid fa-copy text-lg text-slate-400"></i></button>
+
+                    <button id="speak" class=""><i class="fa-solid fa-volume-high text-lg text-slate-400"></i></button>
+                    <button id="themeToggle">
+                        <i class="fa-solid fa-circle-half-stroke text-lg text-slate-400"></i>
+                      </button>
+                      
+                </div>
+            </div>
+            <div>
+                <p id="quote">
+                    Lorem ipsum dolor sit, amet consectetur adipisicing elit. Reprehenderit, nobis animi! Pariatur
+                    provident est dignissimos corrupti nulla nesciunt magnam optio, exercitationem harum quos alias
+                    dolores, accusamus temporibus! Rem, eum modi!
+                </p>
+            </div>
+            <div class="flex justify-between">
+                <p>
+                    <span>--</span>
+                    <span id="authorName"></span>
+                </p>
+                <button id="next" class="text-blue-500 flex gap-2 items-center">Next <i
+                        class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+
+  document.getElementById('themeToggle').addEventListener('click', () => {
+    // Toggle the 'dark' class on the body element
+    document.body.classList.toggle('dark-mode');
+
+    // Optional: Update the icon or button color based on the theme
+    const themeIcon = document.querySelector('#themeToggle i');
+    if (document.body.classList.contains('dark-mode')) {
+      themeIcon.classList.add('text-yellow-500');  // Example: changing the icon color
+      themeIcon.classList.remove('text-slate-400');
+    } else {
+      themeIcon.classList.add('text-slate-400');
+      themeIcon.classList.remove('text-yellow-500');
+    }
+  });
+
+
+        const url = 'https://quotes15.p.rapidapi.com/quotes/random/';
+        const options = {
+            method: 'GET',
+            headers: {
+                'X-RapidAPI-Key': 'c21d6c9be9mshc583abeafaac79ep1b901fjsn82321b7b931a',
+                'X-RapidAPI-Host': 'quotes15.p.rapidapi.com'
+            }
+        };
+
+        async function generate() {
+            try {
+                const response = await fetch(url, options);
+                const result = await response.json();
+                console.log(result);
+                document.getElementById('quote').innerHTML = result.content;
+                document.getElementById('authorName').innerHTML = result.originator.name || "Unknown";
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        window.onload = function () {
+            generate();
+
+            // Next Quote Button
+            document.getElementById('next').addEventListener('click', function () {
+                generate();
+            });
+
+            // Copy Function
+            document.getElementById('copy').addEventListener('click', () => {
+                const text = document.getElementById('quote').innerText;
+                navigator.clipboard.writeText(text).then(() => {
+                    console.log("Quote copied to clipboard!");
+                }).catch(err => {
+                    console.error("Failed to copy: ", err);
+                });
+            });
+
+            // Text-to-Speech (Speak) Function
+            document.getElementById('speak').addEventListener('click', () => {
+                const quoteText = document.getElementById('quote').innerText;
+                const speech = new SpeechSynthesisUtterance(quoteText);
+                window.speechSynthesis.speak(speech);
+            });
+        };
+    </script>
+</body>
+
+</html>
